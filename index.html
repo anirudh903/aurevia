@@ -288,6 +288,20 @@ html, body { overflow-x: hidden; max-width: 100%; }
   .svc h3 { letter-spacing: 0.08em; }
   .cta { padding: 14px 26px; letter-spacing: 0.14em; }
 }
+
+/* ---------- Center content on narrow screens (phone/tablet) ---------- */
+@media (max-width: 1024px) {
+  .steps { align-items: center; }
+  .step { width: 100%; }
+}
+@media (max-width: 640px) {
+  .foot-grid { text-align: center; }
+  .foot .brand { justify-content: center; }
+  .foot .desc { margin-left: auto; margin-right: auto; }
+  .foot .contact li { justify-content: center; }
+  .socials { justify-content: center; }
+  .news { max-width: 340px; margin-left: auto; margin-right: auto; }
+}
 </style>
 
 <!-- SVG symbol defs -->
