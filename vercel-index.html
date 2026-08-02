@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>Aurevia Atelier — Designing Spaces, Creating Legacies</title>
+<style>
+
+
+
+
+
+
+
+:root {
+  color-scheme: light;
+  --cream: #F5F1E8;
+  --cream-light: #FAF7F0;
+  --cream-dark: #EDE7DA;
+  --olive: #4A4832;
+  --olive-deep: #33311E;
+  --olive-darker: #2B2A19;
+  --gold: #B89B6E;
+  --gold-soft: #C9B38A;
+  --gold-bright: #D4BE93;
+  --gold-dark: #9C7E4F;
+  --ink: #33302A;
+  --muted: #4F4A3C;
+  --serif: "Cormorant Garamond", Georgia, serif;
+  --sans: "Jost", system-ui, sans-serif;
+}
+
+/* Committed single warm identity — hold it in both OS/viewer themes */
+:root[data-theme="dark"], :root[data-theme="light"] {
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+.aurevia {
+  font-family: var(--sans);
+  background: var(--cream);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  font-weight: 400;
+}
+.aurevia img { max-width: 100%; display: block; }
+.aurevia a { color: inherit; text-decoration: none; }
+.aurevia ::selection { background: var(--gold); color: var(--olive-deep); }
+
+.wrap { max-width: 1300px; margin: 0 auto; padding: 0 clamp(22px, 5vw, 44px); }
+/* .wrap padding is fluid via clamp */
+
+.serif { font-family: var(--serif); }
+
+/* ---------- Emblem + wordmark ---------- */
+.emblem { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; }
+.wordmark { display: flex; flex-direction: column; line-height: 1; }
+.wordmark .w1 { font-family: var(--serif); font-weight: 500; letter-spacing: 0.22em; }
+.wordmark .w2 { display: flex; align-items: center; gap: 8px; font-weight: 300; letter-spacing: 0.5em; margin-top: 5px; }
+.wordmark .w2::before, .wordmark .w2::after { content: ""; height: 1px; width: 16px; background: currentColor; opacity: 0.7; }
+.wordmark.center { align-items: center; }
+.wordmark .tag { font-weight: 300; letter-spacing: 0.35em; margin-top: 14px; }
+
+/* ---------- Header ---------- */
+.hdr {
+  position: fixed; inset: 0 0 auto 0; z-index: 50;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 40px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.45), transparent);
+  transition: background .5s ease, box-shadow .5s ease, padding .4s ease; transform: translateZ(0); -webkit-backface-visibility: hidden; backface-visibility: hidden;
+}
+.hdr.scrolled { background: rgba(51,49,30,0.96); box-shadow: 0 1px 0 rgba(184,155,110,0.25); padding: 12px 40px; }
+.hdr .brand { display: flex; align-items: center; gap: 12px; color: var(--gold); }
+.hdr .brand .emblem { height: 42px; width: auto; }
+.hdr .brand .w1 { font-size: 22px; }
+.hdr .brand .w2 { font-size: 9px; }
+.nav { display: flex; align-items: center; gap: 28px; }
+.nav a { font-size: 11.5px; letter-spacing: 0.18em; color: rgba(245,241,232,0.85); position: relative; transition: color .3s; }
+.nav a::after { content: ""; position: absolute; left: 0; bottom: -5px; height: 1px; width: 0; background: var(--gold); transition: width .4s cubic-bezier(.22,1,.36,1); }
+.nav a:hover, .nav a.active { color: var(--gold); }
+.nav a:hover::after, .nav a.active::after { width: 100%; }
+.hdr-right { display: flex; align-items: center; gap: 16px; }
+.btn-ghost {
+  background: var(--gold); border: 1px solid var(--gold); border-radius: 999px;
+  padding: 11px 22px; font-size: 11px; font-weight: 500; letter-spacing: 0.16em; color: var(--olive-deep);
+  transition: background .3s, box-shadow .3s; white-space: nowrap; box-shadow: 0 4px 16px rgba(0,0,0,.28);
+}
+.btn-ghost:hover { background: var(--gold-bright); box-shadow: 0 6px 20px rgba(0,0,0,.32); }
+.burger { display: none; flex-direction: column; gap: 5px; width: 34px; height: 34px; align-items: center; justify-content: center; background: none; border: none; cursor: pointer; color: var(--gold); }
+.burger span { height: 1px; width: 24px; background: currentColor; transition: transform .3s, opacity .3s; }
+.burger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.burger.open span:nth-child(2) { opacity: 0; }
+.burger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+.mobile-nav { display: none; flex-direction: column; background: rgba(51,49,30,0.98); }
+.mobile-nav.open { display: flex; }
+.mobile-nav a { padding: 14px 40px; font-size: 13px; letter-spacing: 0.2em; color: rgba(245,241,232,0.85); border-bottom: 1px solid rgba(184,155,110,0.1); }
+
+/* ---------- Hero ---------- */
+.hero { position: relative; height: 100svh; min-height: 620px; overflow: hidden; isolation: isolate; }
+.slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1.5s ease; }
+.slide.active { opacity: 1; }
+.slide-img { position: absolute; inset: 0; background-size: cover; background-position: center; }
+.slide.active .slide-img { animation: kenburns 8s ease-out forwards; }
+@keyframes kenburns { from { transform: scale(1); } to { transform: scale(1.12) translate(-1.5%, -1%); } }
+.hero-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(43,42,25,0.5), rgba(51,49,30,0.26), rgba(43,42,25,0.62)); }
+.hero-overlay2 { position: absolute; inset: 0; background: radial-gradient(ellipse 76% 50% at 50% 46%, rgba(22,21,12,0.46) 0%, rgba(22,21,12,0.18) 56%, rgba(22,21,12,0) 100%); }
+.hero-content { position: relative; z-index: 3; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: var(--cream); padding: 0 24px; }
+.hero-content .emblem { height: 112px; width: auto; color: var(--gold); filter: drop-shadow(0 2px 11px rgba(0,0,0,0.5)); }
+.hero-content .wordmark { color: var(--gold); margin-top: 14px; text-shadow: 0 2px 16px rgba(14,13,7,0.6), 0 1px 2px rgba(14,13,7,0.45); }
+.hero-content .w1 { font-size: clamp(56px, 11vw, 132px); }
+.hero-content .w2 { font-size: clamp(15px, 2vw, 20px); }
+.hero-content .tag { font-size: clamp(10px, 1.4vw, 13px); }
+.hero-logo { width: clamp(220px, 60vw, 470px); height: auto; }
+.cta {
+  display: inline-flex; align-items: center; gap: 12px; margin-top: 40px;
+  background: var(--gold); color: var(--olive-deep); border: none; cursor: pointer;
+  border-radius: 999px; padding: 16px 36px; font-family: var(--sans);
+  font-size: 11.5px; font-weight: 500; letter-spacing: 0.22em;
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,.5); transition: background .4s, box-shadow .4s;
+}
+.cta:hover { background: var(--gold-bright); box-shadow: 0 16px 40px -12px rgba(0,0,0,.6); }
+.cta svg { transition: transform .3s; }
+.cta:hover svg { transform: translateX(4px); }
+.dots { position: absolute; right: 34px; top: 50%; transform: translateY(-50%); z-index: 3; display: flex; flex-direction: column; gap: 16px; }
+.dots button { height: 10px; width: 10px; border-radius: 999px; border: 1px solid rgba(245,241,232,0.7); background: transparent; cursor: pointer; transition: all .4s; padding: 0; }
+.dots button.active { background: var(--cream); transform: scale(1.1); }
+.scroll-hint { position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%); z-index: 3; height: 36px; width: 20px; border: 1px solid rgba(245,241,232,0.5); border-radius: 999px; display: flex; justify-content: center; padding-top: 6px; }
+.scroll-hint span { height: 6px; width: 1px; background: rgba(245,241,232,0.7); animation: bob 2s ease-in-out infinite; }
+@keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
+
+/* ---------- Reveal ---------- */
+.js .reveal { opacity: 0; transform: translateY(30px); transition: opacity .9s cubic-bezier(.22,1,.36,1), transform .9s cubic-bezier(.22,1,.36,1); }
+.js .reveal.in { opacity: 1; transform: none; }
+
+/* ---------- Section label ---------- */
+.eyebrow { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.eyebrow p { font-size: 12.5px; letter-spacing: 0.32em; color: var(--gold-dark); }
+.eyebrow.dark p { color: var(--gold-soft); }
+.diamond-rule { margin-top: 16px; display: flex; align-items: center; gap: 8px; color: var(--gold); }
+.diamond-rule::before, .diamond-rule::after { content: ""; height: 1px; width: 32px; background: currentColor; opacity: 0.6; }
+.diamond-rule svg { height: 8px; width: 8px; }
+
+/* ---------- About ---------- */
+.about { background: var(--cream-light); padding: clamp(64px, 10vw, 120px) 0; }
+.about-grid { display: grid; grid-template-columns: 3fr 6fr 3fr; gap: 40px; align-items: center; }
+.about-img { position: relative; height: 440px; max-width: 320px; width: 100%; margin: 0 auto; overflow: hidden; background: var(--cream-dark); border-radius: 50% 50% 6px 6px / 32% 32% 4px 4px; }
+.about-img div { position: absolute; inset: 0; background-size: cover; background-position: 50% 26%; }
+.about-copy .label { display: flex; align-items: center; gap: 12px; font-size: 11.5px; letter-spacing: 0.28em; color: var(--gold-dark); }
+.about-copy .label::before { content: ""; height: 1px; width: 32px; background: var(--gold-dark); opacity: 0.7; }
+.about-copy h2 { font-family: var(--serif); font-weight: 300; font-size: clamp(32px, 4vw, 48px); line-height: 1.15; color: var(--ink); margin-top: 20px; text-wrap: balance; }
+.about-copy p.body { max-width: 520px; margin-top: 24px; font-size: 15px; line-height: 1.75; color: var(--muted); }
+.founder { display: flex; flex-direction: column; gap: 3px; margin-top: 26px; padding-top: 22px; border-top: 1px solid rgba(184,155,110,0.3); }
+.founder .fn { font-family: var(--serif); font-size: 27px; font-weight: 500; color: var(--ink); line-height: 1; }
+.founder .fr { font-size: 11px; letter-spacing: 0.22em; color: var(--gold-dark); }
+.link-arrow { display: inline-flex; align-items: center; gap: 8px; margin-top: 30px; font-size: 11.5px; font-weight: 500; letter-spacing: 0.24em; color: var(--gold-dark); }
+.link-arrow .u { position: relative; }
+.link-arrow .u::after { content: ""; position: absolute; left: 0; bottom: -4px; height: 1px; width: 0; background: var(--gold); transition: width .4s cubic-bezier(.22,1,.36,1); }
+.link-arrow:hover .u::after { width: 100%; }
+.link-arrow svg { transition: transform .3s; }
+.link-arrow:hover svg { transform: translateX(4px); }
+.stats { border-left: 1px solid rgba(184,155,110,0.25); padding-left: 32px; display: flex; flex-direction: column; }
+.stat { display: flex; align-items: center; gap: 20px; padding: 24px 0; border-bottom: 1px solid rgba(184,155,110,0.2); }
+.stat:first-child { padding-top: 0; } .stat:last-child { border-bottom: none; padding-bottom: 0; }
+.stat svg { height: 36px; width: 36px; color: var(--gold); flex-shrink: 0; }
+.stat .num { font-family: var(--serif); font-weight: 300; font-size: clamp(36px, 4vw, 48px); color: var(--ink); font-variant-numeric: tabular-nums; }
+.stat .cap { margin-top: 4px; font-size: 10px; letter-spacing: 0.2em; color: var(--muted); }
+
+/* ---------- Services ---------- */
+.services { background: var(--cream); padding: clamp(60px, 9vw, 100px) 0; }
+.svc-grid { margin-top: 64px; display: grid; grid-template-columns: repeat(6, 1fr); gap: 20px; }
+.svc {
+  border: 1px solid rgba(184,155,110,0.25); background: rgba(250,247,240,0.6);
+  padding: 36px 20px; text-align: center; display: flex; flex-direction: column; align-items: center;
+  transition: transform .5s, border-color .5s, background .5s, box-shadow .5s;
+}
+.svc:hover { transform: translateY(-6px); border-color: rgba(184,155,110,0.7); background: var(--cream-light); box-shadow: 0 18px 40px -24px rgba(74,72,50,0.5); }
+.svc svg { height: 40px; width: 40px; color: var(--gold); transition: transform .5s; }
+.svc:hover svg { transform: scale(1.1); }
+.svc h3 { margin-top: 24px; font-size: 11.8px; font-weight: 500; letter-spacing: 0.16em; line-height: 1.6; color: var(--ink); white-space: pre-line; }
+.svc p { margin-top: 12px; font-size: 12.5px; line-height: 1.6; color: var(--muted); }
+
+/* ---------- Featured projects ---------- */
+.projects { background: var(--cream-light); padding: clamp(60px, 9vw, 100px) 0; }
+.rail-wrap { position: relative; margin-top: 64px; }
+.rail { display: flex; gap: 20px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; padding-bottom: 8px; scrollbar-width: none; }
+.rail::-webkit-scrollbar { display: none; }
+.card { position: relative; flex: 0 0 calc(25% - 15px); scroll-snap-align: start; height: 350px; overflow: hidden; }
+.card .cimg { position: absolute; inset: 0; background-size: cover; background-position: center; transition: transform 1.2s ease; }
+.card:hover .cimg { transform: scale(1.1); }
+.card .cgrad { position: absolute; inset: 0; background: linear-gradient(to top, rgba(43,42,25,0.85), rgba(43,42,25,0.1) 55%, transparent); }
+.card .cinfo { position: absolute; left: 0; right: 0; bottom: 0; padding: 24px; }
+.card .cinfo h3 { font-family: var(--serif); font-weight: 500; font-size: 24px; color: var(--cream); }
+.card .cinfo p { margin-top: 4px; font-size: 10px; letter-spacing: 0.24em; color: var(--gold-soft); }
+.card .cline { display: block; height: 1px; width: 0; background: var(--gold); margin-top: 12px; transition: width .5s; }
+.card:hover .cline { width: 56px; }
+.rail-next {
+  position: absolute; right: -18px; top: 50%; transform: translateY(-50%); z-index: 4;
+  height: 56px; width: 56px; border-radius: 999px; border: 1px solid rgba(184,155,110,0.6);
+  background: rgba(250,247,240,0.92); color: var(--gold); cursor: pointer;
+  display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px -8px rgba(0,0,0,.3);
+  transition: background .3s, color .3s;
+}
+.rail-next:hover { background: var(--gold); color: var(--cream-light); }
+.view-all { margin-top: 56px; display: flex; justify-content: center; }
+
+/* ---------- Process ---------- */
+.process { position: relative; overflow: hidden; background: var(--olive-deep); padding: clamp(60px, 9vw, 100px) 0; }
+.process::before { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at top, rgba(184,155,110,0.08), transparent 60%); pointer-events: none; }
+.steps { position: relative; margin-top: 64px; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.step { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.step svg { height: 44px; width: 44px; color: var(--gold); }
+.step .st { margin-top: 20px; font-size: 12.8px; letter-spacing: 0.2em; color: var(--cream); }
+.step .st b { color: var(--gold); font-weight: 400; }
+.step .sd { margin-top: 12px; font-size: 12.6px; line-height: 1.6; color: rgba(245,241,232,0.82); white-space: pre-line; }
+.step-arrow { color: rgba(184,155,110,0.5); padding-top: 12px; flex-shrink: 0; }
+
+/* ---------- Footer ---------- */
+.foot { background: var(--olive); color: rgba(245,241,232,0.8); }
+.foot .rule { height: 1px; background: linear-gradient(to right, transparent, rgba(184,155,110,0.4), transparent); }
+.foot-grid { display: grid; grid-template-columns: 3fr 2fr 3fr 2fr 2fr; gap: 32px; padding: 76px 0; }
+.foot .brand { display: flex; align-items: center; gap: 12px; color: var(--gold); }
+.foot .brand .emblem { height: 42px; }
+.foot .brand .w1 { font-size: 20px; } .foot .brand .w2 { font-size: 9px; }
+.foot .desc { margin-top: 24px; max-width: 280px; font-size: 13px; line-height: 1.7; color: rgba(245,241,232,0.74); }
+.foot h4 { margin-bottom: 20px; font-size: 11.5px; font-weight: 500; letter-spacing: 0.24em; color: var(--gold-soft); }
+.foot ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.foot ul a, .foot .ci { font-size: 13px; color: rgba(245,241,232,0.82); transition: color .3s; }
+.foot ul a:hover { color: var(--gold); }
+.foot .contact li { display: flex; align-items: flex-start; gap: 12px; }
+.foot .contact svg { height: 16px; width: 16px; color: var(--gold); flex-shrink: 0; margin-top: 2px; }
+.socials { margin-top: 24px; display: flex; gap: 12px; }
+.socials a { height: 36px; width: 36px; border-radius: 999px; border: 1px solid rgba(184,155,110,0.4); color: var(--gold); display: flex; align-items: center; justify-content: center; transition: background .3s, color .3s; }
+.socials a:hover { background: var(--gold); color: var(--olive-deep); }
+.socials svg { height: 16px; width: 16px; }
+.news { display: flex; margin-top: 4px; }
+.news input { flex: 1; border: 1px solid rgba(184,155,110,0.4); background: transparent; padding: 12px 16px; font-family: var(--sans); font-size: 12.5px; color: var(--cream); }
+.news input::placeholder { color: rgba(245,241,232,0.4); }
+.news input:focus { outline: none; border-color: var(--gold); }
+.news button { width: 48px; border: none; background: var(--gold); color: var(--olive-deep); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .3s; }
+.news button:hover { background: var(--gold-bright); }
+.news-msg { margin-top: 12px; font-size: 11.5px; letter-spacing: 0.1em; color: var(--gold-soft); min-height: 14px; }
+.foot-bar { border-top: 1px solid rgba(184,155,110,0.15); }
+.foot-bar .in { display: flex; align-items: center; justify-content: space-between; padding: 22px 0; gap: 12px; }
+.foot-bar p { font-size: 10.5px; letter-spacing: 0.16em; color: rgba(245,241,232,0.7); }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1024px) {
+  .nav { display: none; }
+  .burger { display: flex; }
+  .about-grid { grid-template-columns: 1fr; gap: 48px; }
+  .stats { border-left: none; padding-left: 0; }
+  .svc-grid { grid-template-columns: repeat(3, 1fr); }
+  .card { flex-basis: calc(50% - 10px); }
+  .steps { flex-direction: column; gap: 36px; }
+  .step-arrow { transform: rotate(90deg); align-self: center; }
+  .foot-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 640px) {
+  .hdr, .hdr.scrolled { padding: 12px 18px; }
+  .hdr .brand .wordmark { display: none; }
+  .hdr .brand .emblem { height: 34px; }
+  .hdr-right { gap: 10px; }
+  .btn-ghost { padding: 9px 15px; font-size: 9.5px; letter-spacing: 0.12em; }
+  /* section padding is fluid via clamp */
+  .svc-grid { grid-template-columns: repeat(2, 1fr); }
+  .card { flex-basis: 82%; }
+  .foot-grid { grid-template-columns: 1fr; gap: 36px; }
+  .foot-bar .in { flex-direction: column; text-align: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .slide.active .slide-img { animation: none; }
+  .scroll-hint span { animation: none; }
+  .slide { transition: opacity .3s; }
+}
+
+/* ---------- Mobile overflow hardening ---------- */
+html, body { overflow-x: hidden; max-width: 100%; }
+.aurevia, .aurevia * { min-width: 0; }
+.aurevia img, .aurevia svg, .aurevia video { max-width: 100%; height: auto; }
+.aurevia p, .aurevia h1, .aurevia h2, .aurevia h3, .aurevia h4, .aurevia span, .aurevia a, .aurevia li { overflow-wrap: break-word; word-break: normal; }
+@media (max-width: 640px) {
+  .eyebrow p { letter-spacing: 0.18em; }
+  .about-copy .label { letter-spacing: 0.16em; }
+  .foot h4 { letter-spacing: 0.16em; }
+  .foot-bar p { letter-spacing: 0.1em; }
+  .step .st { letter-spacing: 0.12em; }
+  .svc h3 { letter-spacing: 0.08em; }
+  .cta { padding: 14px 26px; letter-spacing: 0.14em; }
+}
+
+/* ---------- Center content on narrow screens (phone/tablet) ---------- */
+@media (max-width: 1024px) {
+  .steps { align-items: center; }
+  .step { width: 100%; }
+}
+@media (max-width: 640px) {
+  .foot-grid { text-align: center; }
+  .foot .brand { justify-content: center; }
+  .foot .desc { margin-left: auto; margin-right: auto; }
+  .foot .contact li { justify-content: center; }
+  .socials { justify-content: center; }
+  .news { max-width: 340px; margin-left: auto; margin-right: auto; }
+}
+</style>
+
+<!-- SVG symbol defs -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="emblem" viewBox="0 0 120 132">
+    <g class="emblem" stroke-width="1.5">
+      <path d="M22 124 L22 56 Q22 20 60 20 Q98 20 98 56 L98 124" />
+      <path d="M31 40 L31 74" opacity="0.9" /><path d="M36 36 L36 74" opacity="0.9" /><path d="M41 40 L41 74" opacity="0.9" />
+      <path d="M62 21 L62 45" /><path d="M55 45 Q62 57 69 45 Z" />
+      <path d="M31 106 L31 96 Q31 82 45 82 Q59 82 59 96 L59 106" />
+      <path d="M31 96 Q25 96 25 102 L25 106" /><path d="M59 96 Q65 96 65 102 L65 106" /><path d="M23 106 L67 106" />
+      <path d="M75 106 L87 106 L85 94 L77 94 Z" /><path d="M81 94 L81 78" />
+      <path d="M81 84 Q74 82 73 75 Q80 75 81 82" /><path d="M81 82 Q88 80 89 73 Q82 73 81 80" />
+    </g>
+  </symbol>
+</svg>
+
+<div class="aurevia">
+  <!-- Header -->
+  <header class="hdr" id="hdr">
+    <a href="#home" class="brand" aria-label="Aurevia Atelier home">
+      <img class="emblem" src="https://raw.githubusercontent.com/anirudh903/aurevia/main/images/img1.png" alt="Aurevia Atelier" />
+      <span class="wordmark"><span class="w1">AUREVIA</span><span class="w2">ATELIER</span></span>
+    </a>
+    <nav class="nav" id="nav">
+      <a href="#home" class="active">HOME</a>
+      <a href="#about">ABOUT</a>
+      <a href="#services">SERVICES</a>
+      <a href="#portfolio">PORTFOLIO</a>
+      <a href="#process">PROCESS</a>
+      <a href="#blog">BLOG</a>
+      <a href="#contact">CONTACT</a>
+    </nav>
+    <div class="hdr-right">
+      <a href="#contact" class="btn-ghost">BOOK CONSULTATION</a>
+      <button class="burger" id="burger" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+    </div>
+  </header>
+  <nav class="mobile-nav" id="mobileNav">
+    <a href="#home">HOME</a><a href="#about">ABOUT</a><a href="#services">SERVICES</a>
+    <a href="#portfolio">PORTFOLIO</a><a href="#process">PROCESS</a><a href="#blog">BLOG</a><a href="#contact">CONTACT</a>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero" id="home">
+    <div class="slide active"><div class="slide-img" style="background-image:url(https://raw.githubusercontent.com/anirudh903/aurevia/main/images/img2.jpg)"></div></div>
+    <div class="slide"><div class="slide-img" style="background-image:url(https://raw.githubusercontent.com/anirudh903/aurevia/main/images/img3.jpg)"></div></div>
+    <div class="slide"><div class="slide-img" style="background-image:url(https://raw.githubusercontent.com/anirudh903/aurevia/main/images/img4.jpg)"></div></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-overlay2"></div>
+    <div class="hero-content">
+      <img class="hero-logo" src="https://raw.githubusercontent.com/anirudh903/aurevia/main/images/img5.png" alt="Aurevia Atelier — Designing Spaces, Creating Legacies" />
+      <a href="#portfolio" class="cta">EXPLORE OUR WORK
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+    <div class="dots" id="dots">
+      <button class="active" aria-label="Slide 1"></button>
+      <button aria-label="Slide 2"></button>
+      <button aria-label="Slide 3"></button>
+    </div>
+    <div class="scroll-hint"><span></span></div>
+  </section>
+
+  <!-- About -->
+  <section class="about" id="about">
+    <div class="wrap about-grid">
+      <div class="about-img reveal"><div style="background-image:url(https://raw.githubusercontent.com/anirudh903/aurevia/main/images/img6.jpg)"></div></div>
+      <div class="about-copy">
+        <p class="label reveal">ABOUT AUREVIA ATELIER</p>
+        <h2 class="reveal">Where Vision<br>Meets Timeless Design</h2>
+        <p class="body reveal">Aurevia Atelier is a multidisciplinary interior design studio based in Mumbai, creating bespoke spaces that reflect your personality, purpose and lifestyle. We believe that every space has the power to inspire, uplift and leave a lasting legacy. Led by founder and principal designer Jaina Mehta, the studio pairs a considered eye with hands-on craft on every project.</p>
+        <div class="founder reveal">
+          <span class="fn serif">Jaina Mehta</span>
+          <span class="fr">FOUNDER &amp; PRINCIPAL DESIGNER</span>
+        </div>
+        <a href="#about" class="link-arrow reveal"><span class="u">READ OUR STORY</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+      <div class="stats reveal">
+        <div class="stat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11V8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v3"/><path d="M4 11a2 2 0 0 0-2 2v3h18v-3a2 2 0 0 0-2-2"/><path d="M2 16v2M18 16v2"/><path d="M20 4v9M20 6h1"/></svg>
+          <div><div class="num" data-count="8" data-suffix="+">0</div><div class="cap">YEARS OF EXPERIENCE</div></div>
+        </div>
+        <div class="stat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4-1 10-10-3-3L5 16l-1 4Z"/><path d="M14 6l3 3"/></svg>
+          <div><div class="num" data-count="150" data-suffix="+">0</div><div class="cap">PROJECTS COMPLETED</div></div>
+        </div>
+        <div class="stat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l3 6-9 12L3 9Z"/><path d="M3 9h18M9 3 7 9l5 12M15 3l2 6-5 12"/></svg>
+          <div><div class="num" data-count="100" data-suffix="%">0</div><div class="cap">CLIENT SATISFACTION</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services -->
+  <section class="services" id="services">
+    <div class="wrap">
+      <div class="eyebrow reveal">
+        <p>OUR SERVICES</p>
+        <span class="diamond-rule"><svg viewBox="0 0 12 12"><path d="M6 0 L12 6 L6 12 L0 6 Z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span>
+      </div>
+      <div class="svc-grid">
+        <div class="svc reveal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11V8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v3"/><path d="M4 11a2 2 0 0 0-2 2v3h18v-3a2 2 0 0 0-2-2"/><path d="M2 16v2M18 16v2"/><path d="M20 4v9M20 6h1"/></svg>
+          <h3>RESIDENTIAL
+INTERIORS</h3><p>Beautiful homes, thoughtfully designed for you.</p>
+        </div>
+        <div class="svc reveal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V6a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v15"/><path d="M13 21V9h5a1 1 0 0 1 1 1v11"/><path d="M7 9h3M7 13h3M7 17h3M16 13h0M16 17h0"/><path d="M2 21h20"/></svg>
+          <h3>COMMERCIAL
+INTERIORS</h3><p>Functional, inspiring spaces that elevate your brand.</p>
+        </div>
+        <div class="svc reveal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 10h8M11 3v18M11 15h10M15 15v6"/></svg>
+          <h3>SPACE
+PLANNING</h3><p>Smart layouts that maximize space and enhance flow.</p>
+        </div>
+        <div class="svc reveal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a5 5 0 0 0-5 5v9a3 3 0 0 0 6 0"/><path d="M7 8h5M7 12h5M7 16h4"/><path d="M12 8a5 5 0 0 1 5 5"/></svg>
+          <h3>MATERIAL &
+FINISH CONSULTATION</h3><p>Curated materials, refined for timeless elegance.</p>
+        </div>
+        <div class="svc reveal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v5"/><path d="M8 13a4 4 0 0 0 8 0Z"/><path d="M12 17v2"/><path d="M11 21h2"/></svg>
+          <h3>LIGHTING
+DESIGN</h3><p>Layered lighting that creates mood and depth.</p>
+        </div>
+        <div class="svc reveal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11V7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v4"/><path d="M5 11a2 2 0 0 0-2 2 2 2 0 0 0 2 2v3M19 11a2 2 0 0 1 2 2 2 2 0 0 1-2 2v3"/><path d="M5 15h14"/></svg>
+          <h3>BESPOKE FURNITURE
+& STYLING</h3><p>Custom pieces and styling that complete your space.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured projects -->
+  <section class="projects" id="portfolio">
+    <div class="wrap">
+      <div class="eyebrow reveal">
+        <p>FEATURED PROJECTS</p>
+        <span class="diamond-rule"><svg viewBox="0 0 12 12"><path d="M6 0 L12 6 L6 12 L0 6 Z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span>
+      </div>
+      <div class="rail-wrap reveal">
+        <div class="rail" id="rail">
+          <div class="card"><div class="cimg" style="background-image:url(https://raw.githubusercontent.com/anirudh903/aurevia/main/images/img7.jpg)"></div><div class="cgrad"></div><div class="cinfo"><h3>Serene Residence</h3><p>MUMBAI</p><span class="cline"></span></div></div>
+          <div class="card"><div class="cimg" style="background-image:url(https://raw.githubusercontent.com/anirudh903/aurevia/main/images/img8.jpg)"></div><div class="cgrad"></div><div class="cinfo"><h3>Olive Office</h3><p>MUMBAI</p><span class="cline"></span></div></div>
+          <div class="card"><div class="cimg" style="background-image:url(https://raw.githubusercontent.com/anirudh903/aurevia/main/images/img9.jpg)"></div><div class="cgrad"></div><div class="cinfo"><h3>The Taupe Abode</h3><p>MUMBAI</p><span class="cline"></span></div></div>
+          <div class="card"><div class="cimg" style="background-image:url(https://raw.githubusercontent.com/anirudh903/aurevia/main/images/img10.jpg)"></div><div class="cgrad"></div><div class="cinfo"><h3>Luxe Retreat</h3><p>LONAVALA</p><span class="cline"></span></div></div>
+        </div>
+        <button class="rail-next" id="railNext" aria-label="Next projects">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+      <div class="view-all reveal">
+        <a href="#portfolio" class="link-arrow"><span class="u">VIEW ALL PROJECTS</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Process -->
+  <section class="process" id="process">
+    <div class="wrap">
+      <div class="eyebrow dark reveal">
+        <p>OUR DESIGN PROCESS</p>
+        <span class="diamond-rule"><svg viewBox="0 0 12 12"><path d="M6 0 L12 6 L6 12 L0 6 Z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span>
+      </div>
+      <div class="steps">
+        <div class="step reveal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.3-4.3"/><path d="M9 11h4M11 9v4"/></svg>
+          <p class="st"><b>01.</b> DISCOVER</p><p class="sd">Understanding your
+needs and vision</p>
+        </div>
+        <div class="step-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg></div>
+        <div class="step reveal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.8.8 1 1.3 1 2.5h6c0-1.2.2-1.7 1-2.5A6 6 0 0 0 12 3Z"/></svg>
+          <p class="st"><b>02.</b> CONCEPTUALIZE</p><p class="sd">Ideas, moodboards
+and concepts</p>
+        </div>
+        <div class="step-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg></div>
+        <div class="step reveal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4Z"/><path d="M4 9h6l2 3M9 4v5"/><path d="M14 14l4 4M14 18l4-4"/></svg>
+          <p class="st"><b>03.</b> DESIGN</p><p class="sd">Detailed planning
+and 3D visualizations</p>
+        </div>
+        <div class="step-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg></div>
+        <div class="step reveal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"><path d="M14 6l4 4"/><path d="M11 9l5-5 4 4-5 5Z"/><path d="M13 11l-8 8-2-2 8-8"/></svg>
+          <p class="st"><b>04.</b> EXECUTE</p><p class="sd">Crafting your space
+with perfection</p>
+        </div>
+        <div class="step-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg></div>
+        <div class="step reveal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-6 8 6"/><path d="M6 10v10h12V10"/><path d="M10 20v-5h4v5"/></svg>
+          <p class="st"><b>05.</b> DELIVER</p><p class="sd">A timeless space,
+ready to live in</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="foot" id="contact">
+    <div class="rule"></div>
+    <div class="wrap foot-grid">
+      <div>
+        <div class="brand">
+          <img class="emblem" src="https://raw.githubusercontent.com/anirudh903/aurevia/main/images/img1.png" alt="Aurevia Atelier" />
+          <span class="wordmark"><span class="w1">AUREVIA</span><span class="w2">ATELIER</span></span>
+        </div>
+        <p class="desc">Aurevia Atelier is an interior design studio crafting elegant, functional and timeless spaces across residential and commercial projects.</p>
+      </div>
+      <div>
+        <h4>QUICK LINKS</h4>
+        <ul>
+          <li><a href="#about">About Us</a></li><li><a href="#services">Services</a></li>
+          <li><a href="#portfolio">Portfolio</a></li><li><a href="#process">Our Process</a></li>
+          <li><a href="#blog">Blog</a></li><li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>SERVICES</h4>
+        <ul>
+          <li><a href="#services">Residential Interiors</a></li><li><a href="#services">Commercial Interiors</a></li>
+          <li><a href="#services">Space Planning</a></li><li><a href="#services">Material Consultation</a></li>
+          <li><a href="#services">Lighting Design</a></li><li><a href="#services">Bespoke Furniture</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>CONTACT</h4>
+        <ul class="contact">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h3l1.5 4-2 1.5a11 11 0 0 0 5 5l1.5-2 4 1.5V19a2 2 0 0 1-2 2A16 16 0 0 1 4 6a2 2 0 0 1 1-2Z"/></svg><a href="tel:+918879255737">+91 8879255737</a></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="M3.5 6.5 12 13l8.5-6.5"/></svg><a href="mailto:hello@aureviaatelier.com">hello@aureviaatelier.com</a></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg><span class="ci">Mulund West,<br>Mumbai, India</span></li>
+        </ul>
+        <div class="socials">
+          <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="4.5"/><circle cx="12" cy="12" r="3.5"/><circle cx="16.5" cy="7.5" r="0.6" fill="currentColor"/></svg></a>
+          <a href="#" aria-label="Pinterest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 20c-.3-1 .8-4.8 1.3-7 .2-1 .5-2.4 1.6-2.9 1.3-.6 3 .1 3 2 0 2-1.2 3.6-2.7 3.6-1 0-1.6-.8-1.4-1.7"/></svg></a>
+          <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M14 8h-1.5c-.8 0-1.5.7-1.5 1.5V12M9.5 12h4M12 12v6"/></svg></a>
+        </div>
+      </div>
+      <div>
+        <h4>NEWSLETTER</h4>
+        <p class="desc" style="margin-top:0;margin-bottom:16px">Stay updated with our latest projects and design insights.</p>
+        <form class="news" id="news">
+          <input type="email" required placeholder="Your email address" aria-label="Email address">
+          <button type="submit" aria-label="Subscribe"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button>
+        </form>
+        <p class="news-msg" id="newsMsg"></p>
+      </div>
+    </div>
+    <div class="foot-bar">
+      <div class="wrap in">
+        <p>&copy; 2024 AUREVIA ATELIER. ALL RIGHTS RESERVED.</p>
+        <p>DESIGNING SPACES, CREATING LEGACIES</p>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script>
+(function () {
+  document.documentElement.classList.add("js");
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Header scroll state
+  var hdr = document.getElementById("hdr");
+  function onScroll() { if (window.scrollY > 60) hdr.classList.add("scrolled"); else hdr.classList.remove("scrolled"); }
+  window.addEventListener("scroll", onScroll, { passive: true }); onScroll();
+
+  // Mobile menu
+  var burger = document.getElementById("burger");
+  var mnav = document.getElementById("mobileNav");
+  burger.addEventListener("click", function () {
+    var open = burger.classList.toggle("open");
+    mnav.classList.toggle("open", open);
+  });
+  mnav.querySelectorAll("a").forEach(function (a) {
+    a.addEventListener("click", function () { burger.classList.remove("open"); mnav.classList.remove("open"); });
+  });
+
+  // Hero carousel
+  var slides = document.querySelectorAll(".hero .slide");
+  var dots = document.querySelectorAll("#dots button");
+  var idx = 0;
+  function show(n) {
+    idx = (n + slides.length) % slides.length;
+    slides.forEach(function (s, i) { s.classList.toggle("active", i === idx); });
+    dots.forEach(function (d, i) { d.classList.toggle("active", i === idx); });
+  }
+  dots.forEach(function (d, i) { d.addEventListener("click", function () { show(i); }); });
+  setInterval(function () { show(idx + 1); }, 6500);
+
+  // Scroll reveal with stagger among siblings
+  var reveals = document.querySelectorAll(".reveal");
+  if (reduce || !("IntersectionObserver" in window)) {
+    reveals.forEach(function (el) { el.classList.add("in"); });
+  } else {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          var el = e.target;
+          var sibs = Array.prototype.slice.call(el.parentNode.children).filter(function (c) { return c.classList.contains("reveal"); });
+          var i = sibs.indexOf(el);
+          el.style.transitionDelay = (i > 0 ? i * 0.09 : 0) + "s";
+          el.classList.add("in");
+          io.unobserve(el);
+          if (el.querySelector("[data-count]")) countUp(el);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: "-60px 0px" });
+    reveals.forEach(function (el) { io.observe(el); });
+  }
+
+  // Count-up (stats)
+  function countUp(scope) {
+    scope.querySelectorAll("[data-count]").forEach(function (node) {
+      var target = parseInt(node.getAttribute("data-count"), 10);
+      var suffix = node.getAttribute("data-suffix") || "";
+      if (reduce) { node.textContent = target + suffix; return; }
+      var start = null, dur = 1600;
+      function step(ts) {
+        if (!start) start = ts;
+        var p = Math.min((ts - start) / dur, 1);
+        var eased = 1 - Math.pow(1 - p, 3);
+        node.textContent = Math.round(eased * target) + suffix;
+        if (p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    });
+  }
+
+  // Ensure stats count even if observed as a group (stats container is a single reveal)
+  var statsEl = document.querySelector(".stats");
+  if (statsEl && (reduce || !("IntersectionObserver" in window))) countUp(statsEl);
+
+  // Project rail arrow
+  var rail = document.getElementById("rail");
+  var railNext = document.getElementById("railNext");
+  railNext.addEventListener("click", function () {
+    var card = rail.querySelector(".card");
+    var amt = card ? card.offsetWidth + 20 : rail.clientWidth * 0.8;
+    var atEnd = rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 8;
+    rail.scrollBy({ left: atEnd ? -rail.scrollWidth : amt, behavior: "smooth" });
+  });
+
+  // Nav active state on scroll
+  var sections = ["home", "about", "services", "portfolio", "process", "contact"];
+  var navLinks = document.querySelectorAll("#nav a");
+  if ("IntersectionObserver" in window) {
+    var so = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          navLinks.forEach(function (a) { a.classList.toggle("active", a.getAttribute("href") === "#" + e.target.id); });
+        }
+      });
+    }, { rootMargin: "-45% 0px -50% 0px" });
+    sections.forEach(function (id) { var el = document.getElementById(id); if (el) so.observe(el); });
+  }
+
+  // Newsletter (no backend — friendly confirmation)
+  var news = document.getElementById("news");
+  var newsMsg = document.getElementById("newsMsg");
+  news.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var input = news.querySelector("input");
+    if (!input.value) return;
+    newsMsg.textContent = "Thank you — you're on the list.";
+    input.value = "";
+    setTimeout(function () { newsMsg.textContent = ""; }, 3500);
+  });
+
+  // Safety net: never leave anything stuck invisible — reveal anything already in view
+  function revealInView() {
+    document.querySelectorAll(".reveal:not(.in)").forEach(function (el) {
+      if (el.getBoundingClientRect().top < window.innerHeight * 0.92) el.classList.add("in");
+    });
+  }
+  window.addEventListener("load", function () { setTimeout(revealInView, 200); });
+  window.addEventListener("scroll", revealInView, { passive: true });
+  // Absolute failsafe: never let any content stay hidden
+  setTimeout(function () {
+    document.querySelectorAll(".reveal:not(.in)").forEach(function (el) { el.classList.add("in"); });
+  }, 3500);
+})();
+</script>
